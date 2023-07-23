@@ -1,0 +1,22 @@
+# Editor files
+*~
+
+# Python scratch files
+__pycache__/
+*.pyc
+*.pyo
+
+# Sphinx docs
+docs/_build/
+
+# Build files and directories
+*.whl
+*.tar
+*.tar.*
+*.zip
+*.egg-info/
+build/
+dist/
+.venv/
+.tox/
+.ruff_cache/
