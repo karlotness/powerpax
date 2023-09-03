@@ -14,22 +14,26 @@ A = typing.TypeVar("A", bound=tuple[object, ...])
 K = typing.TypeVar("K", bound=dict[str, object])
 
 
+def get_leaf_length(leaf: typing.Any) -> int:
+    if jnp.ndim(leaf) < 1:
+        raise ValueError("attempted to vmap over array with zero dimensions")
+    return operator.index(jnp.shape(leaf)[0])
+
+
 def determine_splits(
     args: tuple[typing.Any, ...], kwargs: dict[str, typing.Any], chunk_size: int
 ) -> tuple[int, int]:
     # Determine leading axis size
-    lead_sizes: set[int] = set()
-    for leaf in jax.tree_util.tree_leaves((args, list(kwargs.values()))):
-        if jnp.ndim(leaf) < 1:
-            raise ValueError("attempted to vmap over array with zero dimensions")
-        lead_sizes.add(jnp.shape(leaf)[0])
+    lead_sizes = {
+        get_leaf_length(leaf)
+        for leaf in jax.tree_util.tree_leaves((args, list(kwargs.values())))
+    }
     if not lead_sizes:
         raise ValueError("vmap over empty arguments")
     elif len(lead_sizes) > 1:
         lead_size_str = ", ".join(map(str, lead_sizes))
         raise ValueError(f"inconsistent leading dimensions for vmap: {lead_size_str}")
-    size = next(iter(lead_sizes))
-    num_chunks, remainder = divmod(size, operator.index(chunk_size))
+    num_chunks, remainder = divmod(lead_sizes.pop(), operator.index(chunk_size))
     return num_chunks, remainder
 
 
