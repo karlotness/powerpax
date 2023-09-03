@@ -1,0 +1,7 @@
+sphinx>=5.3.0
+furo
+numpy
+matplotlib
+jax[cpu]
+packaging
+myst-nb
