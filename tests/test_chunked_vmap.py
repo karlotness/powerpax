@@ -5,15 +5,17 @@
 import jax
 import jax.numpy as jnp
 import powerpax as ppx
+import pytest
 
 
-def test_matches_vmap():
+@pytest.mark.parametrize("chunk_size", [1, 3, 5, 9, 10, 11])
+def test_matches_vmap(chunk_size):
     def fun(arg):
         return arg * 2
 
     arr = jnp.arange(10)
     jax_res = jax.vmap(fun)(arr)
-    chunked_res = ppx.chunked_vmap(fun, chunk_size=3)(arr)
+    chunked_res = jax.jit(ppx.chunked_vmap(fun, chunk_size=chunk_size))(arr)
     assert jax_res.dtype == chunked_res.dtype
     assert jax_res.shape == chunked_res.shape
     assert jnp.all(jax_res == chunked_res)
