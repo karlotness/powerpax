@@ -53,6 +53,24 @@ def split_args(
 
 
 def chunked_vmap(fun: C, chunk_size: int) -> C:
+    """Like :func:`jax.vmap` but limited to batches of `chunk_size` steps.
+
+    This function behaves like :func:`jax.vmap` in that it vectorizes
+    a function to apply over batches of inputs. However, unlike vmap
+    which carries out all calculations in parallel, this version will
+    perform at most `chunk_size` steps at once and uses
+    :func:`jax.lax.scan` to loop over chunks.
+
+    This is useful in cases where the calculations in `fun` involve
+    large intermediate values which can exhaust available memory. With
+    `chunked_vmap` it is possible to place an upper bound on peak
+    memory use from the intermediate results while preserving some of
+    the performance benefits of vmap, particularly on GPUs.
+    """
+    chunk_size = operator.index(chunk_size)
+    if chunk_size <= 0:
+        raise ValueError(f"chunk_size must be positive (got {chunk_size})")
+
     def outer_scan(_, x):
         args, kwargs = x
         ret = jax.vmap(fun)(*args, **kwargs)
