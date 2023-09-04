@@ -32,6 +32,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/karlotness/powerpax"
+Documentation = "https://powerpax.readthedocs.io"
 "Source Code" = "https://github.com/karlotness/powerpax"
 "Bug Tracker" = "https://github.com/karlotness/powerpax/issues"
 
