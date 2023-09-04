@@ -1,3 +1,6 @@
+# Copyright Karl Otness
+# SPDX-License-Identifier: MIT
+
 import inspect
 import importlib
 import pathlib
