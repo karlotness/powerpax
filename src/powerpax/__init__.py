@@ -11,8 +11,8 @@ to keep the outputs of only a subset of :func:`jax.scan` iterations
 """
 
 __version__ = "0.1.0.dev"
-__all__ = ["chunked_vmap", "sliced_scan", "Static"]
+__all__ = ["chunked_vmap", "sliced_scan", "checkpoint_chunked_scan", "Static"]
 
 from ._vmap import chunked_vmap
-from ._loop import sliced_scan
+from ._loop import sliced_scan, checkpoint_chunked_scan
 from ._tree import Static

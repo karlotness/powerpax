@@ -15,6 +15,10 @@ include:
    Keep a subset of iterations from a :func:`scan <jax.lax.scan>`
    without first storing all intermediate steps.
 
+:func:`checkpoint_chunked_scan <powerpax.checkpoint_chunked_scan>`
+   Perform a :func:`scan <jax.lax.scan>` inserting :func:`checkpoints
+   <jax.checkpoint>` at regular intervals.
+
 :class:`Static <powerpax.Static>`
    Wrap a value to treat it as a static member of a PyTree without
    defining a custom class.

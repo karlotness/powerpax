@@ -15,6 +15,8 @@ Loops
 
 .. autofunction:: powerpax.sliced_scan
 
+.. autofunction:: powerpax.checkpoint_chunked_scan
+
 PyTrees
 -------
 

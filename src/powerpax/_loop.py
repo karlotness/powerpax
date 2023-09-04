@@ -311,3 +311,145 @@ def sliced_scan(
     if step < 0:
         ys = jax.tree_util.tree_map(functools.partial(jnp.flip, axis=0), ys)
     return carry, ys
+
+
+def checkpoint_chunked_scan(
+    f: typing.Callable[[C, X], tuple[C, Y]],
+    init: C,
+    xs: X,
+    length: typing.Optional[int] = None,
+    reverse: bool = False,
+    unroll: int = 1,
+    *,
+    chunk_size: typing.Optional[int] = None,
+) -> tuple[C, Y]:
+    r"""Perform a :func:`scan <jax.lax.scan>` inserting
+    :func:`checkpoints <jax.checkpoint>` every `chunk_size` steps.
+
+    This function performs a normal scan loop, but inserts checkpoints
+    at regular intervals. This can reduce peak memory use (at the cost
+    of recomputation) when computing gradients through the loop.
+
+    Most arguments are as in :func:`jax.lax.scan`.
+
+    Parameters
+    ----------
+    fun: function
+        A function suitable for use with :func:`jax.lax.scan`. Namely,
+        takes two arguments (a carry and `x`) and returns two values
+        (an updated carry and `y`).
+
+    init: object
+        A JAX pytree initializing the carry.
+
+    xs: object
+        A JAX pytree over which to loop. If not :pycode:`None` the
+        loop scans over the leading dimension of each leaf
+        :class:`array <jax.Array>`.
+
+    length: int, optional
+        Integer specifying the number of iterations. Useful if `xs` is
+        :pycode:`None`. If both `length` and `xs` are provided, the
+        implied loop iteration counts must match.
+
+    reverse: bool, optional
+        If :pycode:`False` (default) the loop proceeds in normal
+        forward order. Otherwise the loop will start at the end of
+        each input array in `xs` and fill `ys` from right to left.
+
+    unroll: int, optional
+        An integer allowing greater loop unrolling. Note that this
+        function applies the unrolling to each internal :func:`scan
+        <jax.lax.scan>` adjusting so that this provides an upper bound
+        on the number of unrolled steps for the innermost loop in the
+        case of nested scans.
+
+    chunk_size: int, optional
+        The interval at which to insert checkpoints. Every
+        `chunk_size` loop steps a checkpoint will be inserted,
+        starting with the first step. If this parameter is not
+        specified, the entire scan is treated as one chunk with one
+        checkpoint at the start.
+
+    Returns
+    -------
+    object, object
+        A tuple :pycode:`(carry, ys)`.
+    """
+    jax_checkpoint = jax.checkpoint  # type: ignore[attr-defined]
+    target_length = get_target_length(xs, length)
+    unroll = min(max(1, operator.index(unroll)), target_length)
+    if chunk_size is None:
+        chunk_size = max(1, target_length)
+    chunk_size = operator.index(chunk_size)
+    if chunk_size <= 0:
+        raise ValueError(f"chunk_size must be positive, but got {chunk_size}")
+    if target_length <= chunk_size:
+        # Do a normal scan with one checkpoint around it
+        return typing.cast(
+            tuple[C, Y],
+            jax_checkpoint(
+                lambda init, xs: jax.lax.scan(
+                    f, init, xs, length=length, reverse=reverse, unroll=unroll
+                )
+            )(init, xs),
+        )
+    num_chunks, rem_steps = divmod(target_length, chunk_size)
+    if rem_steps > 0:
+        remainder = jax.tree_util.tree_map(
+            operator.itemgetter(
+                slice(-rem_steps, None) if not reverse else slice(None, rem_steps)
+            ),
+            xs,
+        )
+    else:
+        remainder = None
+    core_steps = num_chunks * chunk_size
+    core = jax.tree_util.tree_map(
+        lambda leaf: (leaf[:core_steps] if not reverse else leaf[-core_steps:]).reshape(
+            (num_chunks, chunk_size)
+        ),
+        xs,
+    )
+    carry = init
+
+    @functools.partial(jax_checkpoint, prevent_cse=False)
+    def inner_scan(carry, xs):
+        return jax.lax.scan(
+            f,
+            carry,
+            xs,
+            length=chunk_size,
+            reverse=reverse,
+            unroll=min(unroll, chunk_size),
+        )
+
+    carry, ys = jax.lax.scan(
+        inner_scan,
+        carry,
+        core,
+        length=num_chunks,
+        reverse=reverse,
+        unroll=min(num_chunks, max(1, unroll // chunk_size)),
+    )
+    ys = jax.tree_util.tree_map(
+        lambda leaf: leaf.reshape((core_steps,) + leaf.shape[2:]), ys
+    )
+    if remainder is not None:
+        carry, rem_ys = jax_checkpoint(
+            lambda init, xs: jax.lax.scan(
+                f,
+                init,
+                xs,
+                length=rem_steps,
+                reverse=reverse,
+                unroll=min(unroll, rem_steps),
+            )
+        )(carry, remainder)
+        ys = jax.tree_util.tree_map(
+            lambda a, b: jnp.concatenate([a, b] if not reverse else [b, a], axis=0),
+            ys,
+            rem_ys,
+        )
+
+    return carry, ys
