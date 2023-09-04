@@ -57,7 +57,8 @@ def split_args(
 
 
 def chunked_vmap(fun: C, chunk_size: int) -> C:
-    """Like :func:`jax.vmap` but limited to batches of `chunk_size` steps.
+    r"""Like :func:`jax.vmap` but limited to batches of `chunk_size`
+    steps.
 
     This function behaves like :func:`jax.vmap` in that it vectorizes
     a function to apply over batches of inputs. However, unlike vmap
@@ -70,6 +71,31 @@ def chunked_vmap(fun: C, chunk_size: int) -> C:
     `chunked_vmap` it is possible to place an upper bound on peak
     memory use from the intermediate results while preserving some of
     the performance benefits of vmap, particularly on GPUs.
+
+    Parameters
+    ----------
+    fun: function
+        Function to be mapped over additional axes.
+
+    chunk_size: int
+        Upper limit on the size of chunks to be vectorized over.
+        Inputs larger than this will be processed with an outer
+        :func:scan <jax.lax.scan>` loop.
+
+    Returns
+    -------
+    function
+        A wrapped version of `fun` which vectorizes over leading axes
+        of each input.
+
+    Note
+    ----
+    Unlike :func:`jax.vmap` this function does not allow specifying
+    `in_axes` or `out_axes`. It vectorizes all parameters over the
+    first axis. Use :func:`jnp.moveaxis <jax.numpy.moveaxis>`,
+    :func:`functools.partial`, and possible :class:`ppx.Static
+    <powerpax.Static>` to map over other axes or to leave a parameter
+    un-vectorized.
     """
     chunk_size = operator.index(chunk_size)
     if chunk_size <= 0:

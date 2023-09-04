@@ -94,6 +94,74 @@ def sliced_scan(
     stop: typing.Optional[int] = None,
     step: typing.Optional[int] = None,
 ) -> tuple[C, Y]:
+    r"""Slice the output of :func:`jax.lax.scan` without first
+    collecting all iterations.
+
+    Using this function is equivalent to::
+
+       carry, ys = jax.lax.scan(f, init, xs, length, reverse, unroll)
+       ys = jax.tree_util.tree_map(
+           lambda leaf: leaf[start:stop:step], ys
+       )
+
+    except that it *does not* first produce a complete `ys`.
+    Internally the loop is split into several steps to collect only
+    the required steps.
+
+    Parameters
+    ----------
+    fun: function
+        A function suitable for use with :func:`jax.lax.scan`. Namely,
+        takes two arguments (a carry and `x`) and returns two values
+        (an updated carry and `y`).
+
+    init: object
+        A JAX pytree initializing the carry.
+
+    xs: object
+        A JAX pytree over which to loop. If not :pycode:`None` the
+        loop scans over the leading dimension of each leaf
+        :class:`array <jax.Array>`.
+
+    length: int, optional
+        Integer specifying the number of iterations. Useful if `xs` is
+        :pycode:`None`. If both `length` and `xs` are provided, the
+        implied loop iteration counts must match.
+
+    reverse: bool, optional
+        If :pycode:`False` (default) the loop proceeds in normal
+        forward order. Otherwise the loop will start at the end of
+        each input array in `xs` and fill `ys` from right to left.
+
+    unroll: int, optional
+        An integer allowing greater loop unrolling. Note that this
+        function applies the unrolling to each internal :func:`scan
+        <jax.lax.scan>` adjusting so that this provides an upper bound
+        on the number of unrolled steps for the innermost loop in the
+        case of nested scans.
+
+    start: int, optional
+        The starting index at which the slice should start.
+
+    stop: int, optional
+        The ending index at which the slice should stop.
+
+    step: int, optional
+        The step size for the slice.
+
+    Returns
+    -------
+    object, object
+        A tuple :pycode:`(carry, ys)` where `ys` has been sliced by
+        `start`, `stop` and `step`.
+
+    Note
+    ----
+    The slicing applies only to `ys`, the carry value is still updated
+    by all loop iterations even if their `y` outputs are skipped by
+    the slice.
+    """
+
     def skip_step(carry, x):
         new_carry, _ = f(carry, x)
         return new_carry, None
