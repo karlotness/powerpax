@@ -1,5 +1,6 @@
 # Powerpax: Utilities for JAX
 
+[![Powerpax on PyPI](https://img.shields.io/pypi/v/powerpax)][pypi]
 [![Documentation](https://readthedocs.org/projects/powerpax/badge/?version=latest)][docs]
 [![Tests](https://github.com/karlotness/powerpax/actions/workflows/test.yml/badge.svg)][tests]
 
