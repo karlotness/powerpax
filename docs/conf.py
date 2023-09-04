@@ -68,6 +68,7 @@ intersphinx_mapping = {
     "jax": ("https://jax.readthedocs.io/en/latest/", None),
 }
 
+
 # Linkcode configuration
 def linkcode_resolve(domain, info):
     if domain != "py":
