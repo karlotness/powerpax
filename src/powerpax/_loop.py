@@ -38,6 +38,10 @@ def get_target_length(xs: object, length: typing.Optional[int]) -> int:
     return leaf_lengths.pop()
 
 
+def clip(a: int, a_min: int, a_max: int) -> int:
+    return min(max(a, a_min), a_max)
+
+
 def compute_slices(
     start: int, step: int, num_ys: int, target_length: int, reverse: bool
 ) -> tuple[slice, typing.Optional[int], slice, int, slice]:
@@ -167,7 +171,7 @@ def sliced_scan(
         return new_carry, None
 
     target_length = get_target_length(xs, length)
-    unroll = min(max(1, operator.index(unroll)), target_length)
+    unroll = clip(operator.index(unroll), 1, target_length)
     start, stop, step = slice(start, stop, step).indices(target_length)
     num_ys = len(range(start, stop, step))
 
@@ -227,7 +231,7 @@ def sliced_scan(
             xs,
             length=abs(step),
             reverse=reverse,
-            unroll=min(unroll, abs(step)),
+            unroll=clip(unroll, 1, abs(step)),
         )
         return carry, y
 
@@ -255,7 +259,7 @@ def sliced_scan(
                 jax.tree_util.tree_map(operator.itemgetter(slicer), xs),
                 length=length,
                 reverse=reverse,
-                unroll=min(unroll, length),
+                unroll=clip(unroll, 1, length),
             )
         return new_carry
 
@@ -284,7 +288,7 @@ def sliced_scan(
                 jax.tree_util.tree_map(leaf_reshape, xs),
                 length=outer_steps,
                 reverse=reverse,
-                unroll=min(outer_steps, max(1, unroll // abs(step))),
+                unroll=clip(unroll // abs(step), 1, outer_steps),
             )
         else:
             # No nested scan required
@@ -294,7 +298,7 @@ def sliced_scan(
                 jax.tree_util.tree_map(operator.itemgetter(core_slice), xs),
                 length=outer_steps,
                 reverse=reverse,
-                unroll=min(outer_steps, max(1, unroll)),
+                unroll=clip(unroll, 1, outer_steps),
             )
         # Concatenate if necessary
         if pre_y is not None:
@@ -377,7 +381,7 @@ def checkpoint_chunked_scan(
     """
     jax_checkpoint = jax.checkpoint  # type: ignore[attr-defined]
     target_length = get_target_length(xs, length)
-    unroll = min(max(1, operator.index(unroll)), target_length)
+    unroll = clip(operator.index(unroll), 1, target_length)
     if chunk_size is None:
         chunk_size = max(1, target_length)
     chunk_size = operator.index(chunk_size)
@@ -420,7 +424,7 @@ def checkpoint_chunked_scan(
             xs,
             length=chunk_size,
             reverse=reverse,
-            unroll=min(unroll, chunk_size),
+            unroll=clip(unroll, 1, chunk_size),
         )
 
     carry, ys = jax.lax.scan(
@@ -429,7 +433,7 @@ def checkpoint_chunked_scan(
         core,
         length=num_chunks,
         reverse=reverse,
-        unroll=min(num_chunks, max(1, unroll // chunk_size)),
+        unroll=clip(unroll // chunk_size, 1, num_chunks),
     )
     ys = jax.tree_util.tree_map(
         lambda leaf: leaf.reshape((core_steps,) + leaf.shape[2:]), ys
@@ -442,7 +446,7 @@ def checkpoint_chunked_scan(
                 xs,
                 length=rem_steps,
                 reverse=reverse,
-                unroll=min(unroll, rem_steps),
+                unroll=clip(unroll, 1, rem_steps),
             )
         )(carry, remainder)
         ys = jax.tree_util.tree_map(
