@@ -28,18 +28,30 @@ import pytest
     ],
 )
 @pytest.mark.parametrize("reverse", [False, True])
-def test_matches_scan(start, stop, step, reverse):
+@pytest.mark.parametrize("use_xs", [True, False])
+def test_matches_scan(start, stop, step, reverse, use_xs):
     def scan_fn(carry, x):
         return carry + 1, (carry, x)
 
-    xs = jnp.arange(15)
-    jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, reverse=reverse)
+    length = 15
+    if use_xs:
+        xs = jnp.arange(length)
+    else:
+        xs = None
+    jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, length=length, reverse=reverse)
     jax_ys = jax.tree_util.tree_map(
         operator.itemgetter(slice(start, stop, step)), jax_ys
     )
     ppx_carry, ppx_ys = jax.jit(
         lambda init, xs: ppx.sliced_scan(
-            scan_fn, init, xs, reverse=reverse, start=start, stop=stop, step=step
+            scan_fn,
+            init,
+            xs,
+            length=length,
+            reverse=reverse,
+            start=start,
+            stop=stop,
+            step=step,
         )
     )(0, xs)
     assert jax.tree_util.tree_all(
