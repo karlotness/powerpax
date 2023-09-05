@@ -243,7 +243,6 @@ def sliced_scan(
         length = len(range(*slicer.indices(target_length)))
         if length <= 0:
             new_carry = carry
-            return carry
         elif length == 1:
             # Call function directly
             new_carry, _ = jax.jit(skip_step)(
