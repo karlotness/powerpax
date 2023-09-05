@@ -220,9 +220,11 @@ def sliced_scan(
         dummy_y = jax.tree_map(
             lambda sd: jnp.zeros(sd.shape, dtype=sd.dtype),
             jax.eval_shape(
-                lambda carry, x: f(carry, x)[1],
+                lambda carry, xs: f(
+                    carry, jax.tree_util.tree_map(operator.itemgetter(0), xs)
+                )[1],
                 carry,
-                jax.tree_util.tree_map(operator.itemgetter(0), xs),
+                xs,
             ),
         )
         (carry, y), _ = jax.lax.scan(
