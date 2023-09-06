@@ -109,15 +109,17 @@ def sliced_scan(
        )
 
     except that it *does not* first produce a complete `ys`.
-    Internally the loop is split into several steps to collect only
-    the required steps.
+    Internally the loop is split into several separate (and in some
+    cases nested) scan phases to collect only the required steps.
+
+    Most arguments are as in :func:`jax.lax.scan`.
 
     Parameters
     ----------
     fun: function
         A function suitable for use with :func:`jax.lax.scan`. Namely,
-        takes two arguments (a carry and `x`) and returns two values
-        (an updated carry and `y`).
+        takes two arguments (a `carry` and `x`) and returns two values
+        (an updated `carry` and `y`).
 
     init: object
         A JAX pytree initializing the carry.
@@ -371,10 +373,10 @@ def checkpoint_chunked_scan(
 
     chunk_size: int, optional
         The interval at which to insert checkpoints. Every
-        `chunk_size` loop steps a checkpoint will be inserted,
-        starting with the first step. If this parameter is not
-        specified, the entire scan is treated as one chunk with one
-        checkpoint at the start.
+        `chunk_size` steps a checkpoint will be inserted, starting
+        with the first step. If this parameter is not specified, the
+        entire scan is treated as one chunk with one checkpoint at the
+        start.
 
     Returns
     -------

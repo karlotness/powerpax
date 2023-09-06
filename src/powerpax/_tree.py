@@ -12,10 +12,10 @@ T = typing.TypeVar("T")
 
 @dataclasses.dataclass(frozen=True)
 class Static(typing.Generic[T]):
-    r"""Treat a value as :term:`jax:static` when processing a PyTree.
+    r"""Treat a value as :term:`jax:static` when processing a pytree.
 
-    This class wraps a `value` and will instruct JAX to treat it as a
-    static value during PyTree processing.
+    This class wraps `value` and will instruct JAX to treat it as a
+    static value during pytree processing.
 
     Parameters
     ----------

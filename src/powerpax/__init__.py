@@ -6,8 +6,8 @@ r"""Useful utilities for JAX.
 This package provides a small set of useful utilities for working with
 JAX. For example, functions to limit the memory consumption of
 :func:`jax.vmap` (:func:`ppx.chunked_vmap <powerpax.chunked_vmap>`) or
-to keep the outputs of only a subset of :func:`jax.scan` iterations
-(:func:`ppx.sliced_scan <powerpax.sliced_scan>`).
+to keep the outputs of only a subset of :func:`jax.lax.scan`
+iterations (:func:`ppx.sliced_scan <powerpax.sliced_scan>`).
 """
 
 __version__ = "0.2.0.dev"

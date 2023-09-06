@@ -20,8 +20,8 @@ include:
    <jax.checkpoint>` at regular intervals.
 
 :class:`Static <powerpax.Static>`
-   Wrap a value to treat it as a static member of a PyTree without
-   defining a custom class.
+   Wrap a value to treat it as a :term:`jax:static` member of a pytree
+   without defining a custom class.
 
 .. toctree::
    :maxdepth: 1

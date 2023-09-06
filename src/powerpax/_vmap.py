@@ -80,7 +80,7 @@ def chunked_vmap(fun: C, chunk_size: int) -> C:
     chunk_size: int
         Upper limit on the size of chunks to be vectorized over.
         Inputs larger than this will be processed with an outer
-        :func:scan <jax.lax.scan>` loop.
+        :func:`scan <jax.lax.scan>` loop.
 
     Returns
     -------
@@ -92,10 +92,9 @@ def chunked_vmap(fun: C, chunk_size: int) -> C:
     ----
     Unlike :func:`jax.vmap` this function does not allow specifying
     `in_axes` or `out_axes`. It vectorizes all parameters over the
-    first axis. Use :func:`jnp.moveaxis <jax.numpy.moveaxis>`,
-    :func:`functools.partial`, and possible :class:`ppx.Static
-    <powerpax.Static>` to map over other axes or to leave a parameter
-    un-vectorized.
+    first axis. Use :func:`jnp.moveaxis <jax.numpy.moveaxis>` and
+    :func:`functools.partial` to map over other axes or to leave a
+    parameter un-vectorized.
     """
     chunk_size = operator.index(chunk_size)
     if chunk_size <= 0:

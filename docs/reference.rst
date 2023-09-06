@@ -17,7 +17,7 @@ Loops
 
 .. autofunction:: powerpax.checkpoint_chunked_scan
 
-PyTrees
+Pytrees
 -------
 
 .. autoclass:: powerpax.Static
