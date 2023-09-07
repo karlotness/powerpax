@@ -45,16 +45,22 @@ def clip(a: int, a_min: int, a_max: int) -> int:
 def compute_slices(
     start: int, step: int, num_ys: int, target_length: int, reverse: bool
 ) -> tuple[slice, typing.Optional[int], slice, int, slice]:
+    # First, compute the start and end indices of the iteration range (inclusive)
     start_index = start
     end_index = start + (step * (num_ys - 1))
+    # Next, we compute how many steps we skip at the left/right side of the array
     if step > 0:
+        # Looping in increasing order
         start_skip = start_index
         end_skip = target_length - end_index - 1
     else:
+        # Looping in decreasing order (we have to skip end_index steps steps)
         start_skip = end_index
         end_skip = target_length - start_index - 1
+    # If the loop iterates in reverse, we have to skip the right side steps first
     if reverse:
         start_skip, end_skip = end_skip, start_skip
+    # Determine how many iterations we have to do for the core loop (outputs ys)
     if num_ys == 1:
         # Special case for 1 output (do the core without a scan)
         pre_step = True
@@ -68,8 +74,9 @@ def compute_slices(
         start_skip -= abs(step) - 1
         pre_step = False
         outer_steps = num_ys
-    # Compute slices
+    # Compute slices to divide xs into chunks
     if reverse:
+        # Looping in reverse order (start_slice is at the right end of the array)
         start_slice = slice(target_length - start_skip, None)
         pre_slice = target_length - start_skip - 1 if pre_step else None
         core_slice = slice(
@@ -77,6 +84,7 @@ def compute_slices(
         )
         end_slice = slice(None, end_skip)
     else:
+        # Looping in forward order (start_slice is at the left end of the array)
         start_slice = slice(None, start_skip)
         pre_slice = start_skip if pre_step else None
         core_slice = slice(
