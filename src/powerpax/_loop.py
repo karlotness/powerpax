@@ -124,7 +124,7 @@ def sliced_scan(
 
     Parameters
     ----------
-    fun: function
+    f: function
         A function suitable for use with :func:`jax.lax.scan`. Namely,
         takes two arguments (a `carry` and `x`) and returns two values
         (an updated `carry` and `y`).
@@ -349,7 +349,7 @@ def checkpoint_chunked_scan(
 
     Parameters
     ----------
-    fun: function
+    f: function
         A function suitable for use with :func:`jax.lax.scan`. Namely,
         takes two arguments (a carry and `x`) and returns two values
         (an updated carry and `y`).
