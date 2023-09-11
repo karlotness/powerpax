@@ -17,4 +17,4 @@ def test_roundtrip_static():
 def test_no_leaves():
     obj = ppx.Static(1.5)
     leaves = jax.tree_util.tree_leaves(obj)
-    assert not leaves
+    assert len(leaves) == 0
