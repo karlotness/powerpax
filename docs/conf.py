@@ -21,7 +21,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
-    "myst_nb",
 ]
 
 templates_path = ["_templates"]
@@ -29,12 +28,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_static_path = ["_static"]
 html_css_files = []
 suppress_warnings = ["epub.unknown_project_files"]
-
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".md": "myst-nb",
-}
 
 # Insert code into each rst file
 rst_prolog = r"""
@@ -49,9 +42,6 @@ rst_prolog = r"""
 
 # Theme
 html_theme = "furo"
-
-# MyST-NB configuration
-nb_merge_streams = True
 
 # Autodoc configuration
 autodoc_mock_imports = []
