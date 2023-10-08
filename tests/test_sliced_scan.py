@@ -34,10 +34,7 @@ def test_matches_scan(start, stop, step, reverse, use_xs):
         return carry + 1, (carry, x)
 
     length = 15
-    if use_xs:
-        xs = jnp.arange(length)
-    else:
-        xs = None
+    xs = jnp.arange(length) if use_xs else None
     jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, length=length, reverse=reverse)
     jax_ys = jax.tree_util.tree_map(
         operator.itemgetter(slice(start, stop, step)), jax_ys
