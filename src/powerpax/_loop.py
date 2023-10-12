@@ -118,7 +118,9 @@ def sliced_scan(
 
     except that it *does not* first produce a complete `ys`.
     Internally the loop is split into several separate (and in some
-    cases nested) scan phases to collect only the required steps.
+    cases nested) scan phases to collect only the required steps. See
+    :func:`jax.tree_util.tree_map` for information on its effect in
+    the above example.
 
     Most arguments are as in :func:`jax.lax.scan`.
 
