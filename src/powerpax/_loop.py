@@ -122,7 +122,8 @@ def sliced_scan(
     :func:`jax.tree_util.tree_map` for information on its effect in
     the above example.
 
-    Most arguments are as in :func:`jax.lax.scan`.
+    Most arguments are as in :func:`jax.lax.scan`. New parameters for
+    this function are `start`, `stop`, and `step`.
 
     Parameters
     ----------
@@ -347,7 +348,8 @@ def checkpoint_chunked_scan(
     at regular intervals. This can reduce peak memory use (at the cost
     of recomputation) when computing gradients through the loop.
 
-    Most arguments are as in :func:`jax.lax.scan`.
+    Most arguments are as in :func:`jax.lax.scan`. This function has
+    one added parameter, `chunk_size`.
 
     Parameters
     ----------
