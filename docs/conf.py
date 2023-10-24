@@ -4,7 +4,6 @@
 import inspect
 import importlib
 import pathlib
-import re
 import packaging.version
 import powerpax as ppx
 
@@ -64,7 +63,7 @@ def linkcode_resolve(domain, info):
     if domain != "py":
         return None
     mod_name = info["module"]
-    if not re.match(r"^powerpax(?:\.|$)", mod_name):
+    if mod_name != "powerpax" and not mod_name.startswith("powerpax."):
         return None
     fullname = info["fullname"]
     pkg_root = pathlib.Path(ppx.__file__).parent
