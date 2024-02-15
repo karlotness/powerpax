@@ -454,7 +454,7 @@ def checkpoint_chunked_scan(
     ys = jax.tree_util.tree_map(
         lambda leaf: leaf.reshape((core_steps,) + leaf.shape[2:]), ys
     )
-    if remainder is not None:
+    if rem_steps > 0:
         carry, rem_ys = jax_checkpoint(
             lambda init, xs: jax.lax.scan(
                 f,
