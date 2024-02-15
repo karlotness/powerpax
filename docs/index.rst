@@ -29,4 +29,5 @@ include:
 
    install
    reference
+   changes
    license
