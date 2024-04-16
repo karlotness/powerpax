@@ -6,6 +6,10 @@ version of `powerpax`. More information and release builds are also
 available on the `GitHub releases page
 <https://github.com/karlotness/powerpax/releases>`__.
 
+v0.1.2
+------
+Fix deprecation warning from stray use of `jax.tree_map`.
+
 v0.1.1
 ------
 Fix bug in :func:`~powerpax.checkpoint_chunked_scan`. The issue caused
