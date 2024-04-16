@@ -230,7 +230,7 @@ def sliced_scan(
         return (new_carry, new_y), None
 
     def inner_scan(carry, xs):
-        dummy_y = jax.tree_map(
+        dummy_y = jax.tree_util.tree_map(
             lambda sd: jnp.zeros(sd.shape, dtype=sd.dtype),
             jax.eval_shape(
                 lambda carry, xs: f(
