@@ -5,6 +5,7 @@
 import operator
 import functools
 import typing
+import math
 import jax
 import jax.numpy as jnp
 
@@ -120,7 +121,7 @@ def chunked_vmap(fun: C, chunk_size: int) -> C:
             outer_scan, None, (leading_args, leading_kwargs), length=num_chunks
         )
         ret = jax.tree_util.tree_map(
-            lambda arr: arr.reshape((-1,) + arr.shape[2:]), ret
+            lambda arr: arr.reshape((math.prod(arr.shape[:2]),) + arr.shape[2:]), ret
         )
         # Next, the remainder (if needed)
         if rem_args is not None and rem_kwargs is not None:
