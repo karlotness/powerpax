@@ -20,7 +20,7 @@ def get_leaf_length(leaf: jax.Array) -> int:
     return operator.index(jnp.shape(leaf)[0])
 
 
-def get_target_length(xs: object, length: typing.Optional[int]) -> int:
+def get_target_length(xs: object, length: int | None) -> int:
     leaf_lengths = {get_leaf_length(x) for x in jax.tree_util.tree_leaves(xs)}
     if len(leaf_lengths) > 1:
         size_str = ", ".join(map(str, leaf_lengths))
@@ -44,7 +44,7 @@ def clip(a: int, a_min: int, a_max: int) -> int:
 
 def compute_slices(
     start: int, step: int, num_ys: int, target_length: int, reverse: bool
-) -> tuple[slice, typing.Optional[int], slice, int, slice]:
+) -> tuple[slice, int | None, slice, int, slice]:
     # First, compute the start and end indices of the iteration range (inclusive)
     start_index = start
     end_index = start + (step * (num_ys - 1))
@@ -98,13 +98,13 @@ def sliced_scan(
     f: typing.Callable[[C, X], tuple[C, Y]],
     init: C,
     xs: X,
-    length: typing.Optional[int] = None,
+    length: int | None = None,
     reverse: bool = False,
     unroll: int = 1,
     *,
-    start: typing.Optional[int] = None,
-    stop: typing.Optional[int] = None,
-    step: typing.Optional[int] = None,
+    start: int | None = None,
+    stop: int | None = None,
+    step: int | None = None,
 ) -> tuple[C, Y]:
     r"""Slice the output of :func:`jax.lax.scan` without first
     collecting all iterations.
@@ -335,11 +335,11 @@ def checkpoint_chunked_scan(
     f: typing.Callable[[C, X], tuple[C, Y]],
     init: C,
     xs: X,
-    length: typing.Optional[int] = None,
+    length: int | None = None,
     reverse: bool = False,
     unroll: int = 1,
     *,
-    chunk_size: typing.Optional[int] = None,
+    chunk_size: int | None = None,
 ) -> tuple[C, Y]:
     r"""Perform a :func:`scan <jax.lax.scan>` inserting
     :func:`checkpoints <jax.checkpoint>` every `chunk_size` steps.

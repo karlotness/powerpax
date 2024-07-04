@@ -40,7 +40,7 @@ def determine_splits(
 
 def split_args(
     args: A, kwargs: K, chunk_size: int, num_chunks: int, remainder: int
-) -> tuple[tuple[A, K], typing.Union[tuple[A, K], tuple[None, None]]]:
+) -> tuple[tuple[A, K], tuple[A, K] | tuple[None, None]]:
     main_size = num_chunks * chunk_size
     leading_args, leading_kwargs = jax.tree_util.tree_map(
         lambda arr: arr[:main_size].reshape((num_chunks, chunk_size) + arr.shape[1:]),
