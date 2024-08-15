@@ -6,6 +6,11 @@ version of `powerpax`. More information and release builds are also
 available on the `GitHub releases page
 <https://github.com/karlotness/powerpax/releases>`__.
 
+v0.2.0 (Unreleased)
+-------------------
+
+* Require Python 3.10 or later.
+
 v0.1.2
 ------
 Fix deprecation warning from stray use of `jax.tree_map`.
