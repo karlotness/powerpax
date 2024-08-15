@@ -112,14 +112,12 @@ def sliced_scan(
     Using this function is equivalent to::
 
        carry, ys = jax.lax.scan(f, init, xs, length, reverse, unroll)
-       ys = jax.tree_util.tree_map(
-           lambda leaf: leaf[start:stop:step], ys
-       )
+       ys = jax.tree.map(lambda leaf: leaf[start:stop:step], ys)
 
     except that it *does not* first produce a complete `ys`.
     Internally the loop is split into several separate (and in some
     cases nested) scan phases to collect only the required steps. See
-    :func:`jax.tree_util.tree_map` for information on its effect in
+    :func:`jax.tree.map` for information on its effect in
     the above example.
 
     Most arguments are as in :func:`jax.lax.scan`. New parameters for
