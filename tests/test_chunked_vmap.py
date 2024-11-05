@@ -31,5 +31,5 @@ def test_error_invalid_chunk_size(chunk_size):
     def fun(arg):
         return arg * 2
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="chunk_size must be positive"):
         _ = ppx.chunked_vmap(fun, chunk_size=chunk_size)
