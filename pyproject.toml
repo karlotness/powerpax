@@ -56,7 +56,7 @@ respect-gitignore = true
 fix = false
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "B", "RUF", "UP", "C4", "YTT", "T10", "T20", "ICN", "SIM"]
+select = ["E", "F", "W", "B", "RUF", "UP", "C4", "YTT", "T10", "T20", "ICN", "SIM", "NPY", "PT"]
 ignore = ["E741", "E743", "UP015", "SIM108"]
 
 [tool.ruff.lint.flake8-import-conventions]
@@ -64,6 +64,9 @@ ignore = ["E741", "E743", "UP015", "SIM108"]
 "jax.numpy" = "jnp"
 "equinox" = "eqx"
 "powerpax" = "ppx"
+
+[tool.ruff.lint.flake8-pytest-style]
+parametrize-names-type = "csv"
 
 [tool.mypy]
 warn_unused_configs = true
