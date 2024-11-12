@@ -1,4 +1,4 @@
-# Copyright Karl Otness
+# Copyright 2023 Karl Otness
 # SPDX-License-Identifier: MIT
 
 import inspect
@@ -9,7 +9,7 @@ import powerpax as ppx
 
 # Project information
 project = "powerpax"
-copyright = "Karl Otness"
+copyright = "2023 Karl Otness"
 author = "Karl Otness"
 version = ppx.__version__
 release = version
