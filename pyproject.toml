@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
+requires = ["flit_core >=3.11,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -7,13 +7,13 @@ name = "powerpax"
 description = "Small collection of useful utilities for JAX"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE.txt"]
 authors = [
   {name = "Karl Otness"},
 ]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering",
@@ -38,7 +38,7 @@ Documentation = "https://powerpax.readthedocs.io"
 "Bug Tracker" = "https://github.com/karlotness/powerpax/issues"
 
 [tool.flit.sdist]
-include = ["tests/", "LICENSE.txt"]
+include = ["tests/"]
 exclude = ["**/*~"]
 
 [tool.pytest.ini_options]
