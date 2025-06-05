@@ -28,10 +28,11 @@ import pytest
     ],
 )
 @pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("unroll", [1, 2, 3, 15, 100])
 @pytest.mark.parametrize(
     "use_xs,use_length", [(True, True), (True, False), (False, True)]
 )
-def test_matches_scan(start, stop, step, reverse, use_xs, use_length):
+def test_matches_scan(start, stop, step, reverse, unroll, use_xs, use_length):
     def scan_fn(carry, x):
         return carry + 1, (carry, x)
 
@@ -48,6 +49,7 @@ def test_matches_scan(start, stop, step, reverse, use_xs, use_length):
             init,
             xs,
             reverse=reverse,
+            unroll=unroll,
             start=start,
             stop=stop,
             step=step,
