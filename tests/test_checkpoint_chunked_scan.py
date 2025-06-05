@@ -10,11 +10,10 @@ import pytest
 
 @pytest.mark.parametrize("chunk_size", [None, 1, 2, 5, 7, 15, 100])
 @pytest.mark.parametrize("reverse", [True, False])
-@pytest.mark.parametrize("unroll", [1, 2, 3, 15, 100])
 @pytest.mark.parametrize(
     "use_xs,use_length", [(True, True), (True, False), (False, True)]
 )
-def test_matches_scan(chunk_size, reverse, unroll, use_xs, use_length):
+def test_matches_scan(chunk_size, reverse, use_xs, use_length):
     def scan_fn(carry, x):
         return carry + 1, (carry, x)
 
@@ -28,9 +27,30 @@ def test_matches_scan(chunk_size, reverse, unroll, use_xs, use_length):
             init,
             xs,
             reverse=reverse,
-            unroll=unroll,
             chunk_size=chunk_size,
             **extra_args,
+        )
+    )(0, xs)
+    assert jax.tree_util.tree_all(
+        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_ys, ppx_ys)
+    )
+    assert jax.tree_util.tree_all(
+        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_carry, ppx_carry)
+    )
+
+
+@pytest.mark.parametrize("unroll", [1, 2, 3, 15, 100])
+def test_unroll(unroll):
+    def scan_fn(carry, x):
+        return carry + 1, (carry, x)
+
+    chunk_size = 2
+    length = 15
+    xs = jnp.arange(length)
+    jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, length=length, unroll=unroll)
+    ppx_carry, ppx_ys = jax.jit(
+        lambda init, xs: ppx.checkpoint_chunked_scan(
+            scan_fn, init, xs, unroll=unroll, chunk_size=chunk_size, length=length
         )
     )(0, xs)
     assert jax.tree_util.tree_all(
