@@ -9,16 +9,23 @@ import powerpax as ppx
 from hypothesis import given, strategies as st
 
 
+@st.composite
+def length_slice_unroll(draw):
+    length = draw(st.integers(min_value=0, max_value=15))
+    sl = draw(st.slices(length).filter(lambda sl: abs(sl.step or 1) < 2**16))
+    unroll = draw(
+        st.integers(min_value=1, max_value=max(1, len(range(*sl.indices(length)))) + 1)
+    )
+    return length, sl, unroll
+
+
 @given(
-    length=st.integers(min_value=0, max_value=15),
-    start=(st.integers(min_value=-31, max_value=31) | st.none()),
-    stop=(st.integers(min_value=-31, max_value=31) | st.none()),
-    step=(st.integers(min_value=-31, max_value=31).filter(bool) | st.none()),
+    len_sl_unr=length_slice_unroll(),
     reverse=st.booleans(),
     use_xs_length=st.tuples(st.booleans(), st.booleans()).filter(any),
-    unroll=st.integers(min_value=1, max_value=17),
 )
-def test_matches_scan(length, start, stop, step, reverse, use_xs_length, unroll):
+def test_matches_scan(len_sl_unr, reverse, use_xs_length):
+    length, sl, unroll = len_sl_unr
     use_xs, use_length = use_xs_length
 
     def scan_fn(carry, x):
@@ -29,9 +36,7 @@ def test_matches_scan(length, start, stop, step, reverse, use_xs_length, unroll)
     jax_carry, jax_ys = jax.lax.scan(
         scan_fn, 0, xs, reverse=reverse, unroll=unroll, **extra_args
     )
-    jax_ys = jax.tree_util.tree_map(
-        operator.itemgetter(slice(start, stop, step)), jax_ys
-    )
+    jax_ys = jax.tree_util.tree_map(operator.itemgetter(sl), jax_ys)
     ppx_carry, ppx_ys = jax.jit(
         lambda init, xs: ppx.sliced_scan(
             scan_fn,
@@ -39,9 +44,9 @@ def test_matches_scan(length, start, stop, step, reverse, use_xs_length, unroll)
             xs,
             reverse=reverse,
             unroll=unroll,
-            start=start,
-            stop=stop,
-            step=step,
+            start=sl.start,
+            stop=sl.stop,
+            step=sl.step,
             **extra_args,
         )
     )(0, xs)

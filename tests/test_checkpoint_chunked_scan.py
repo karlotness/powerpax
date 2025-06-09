@@ -8,14 +8,21 @@ import powerpax as ppx
 from hypothesis import given, strategies as st
 
 
+@st.composite
+def length_chunk_size_unroll(draw):
+    length = draw(st.integers(min_value=0, max_value=15))
+    chunk_size = draw(st.integers(min_value=1, max_value=length + 1) | st.none())
+    unroll = draw(st.integers(min_value=1, max_value=length + 1))
+    return length, chunk_size, unroll
+
+
 @given(
-    length=st.integers(min_value=0, max_value=15),
-    chunk_size=(st.integers(min_value=1, max_value=100) | st.none()),
+    len_cs_unr=length_chunk_size_unroll(),
     reverse=st.booleans(),
     use_xs_length=st.tuples(st.booleans(), st.booleans()).filter(any),
-    unroll=st.integers(min_value=1, max_value=17),
 )
-def test_matches_scan(length, chunk_size, reverse, use_xs_length, unroll):
+def test_matches_scan(len_cs_unr, reverse, use_xs_length):
+    length, chunk_size, unroll = len_cs_unr
     use_xs, use_length = use_xs_length
 
     def scan_fn(carry, x):

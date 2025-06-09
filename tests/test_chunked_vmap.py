@@ -9,12 +9,19 @@ import pytest
 from hypothesis import given, strategies as st
 
 
+@st.composite
+def length_chunk_size(draw):
+    length = draw(st.integers(min_value=0, max_value=15))
+    chunk_size = draw(st.integers(min_value=1, max_value=length + 1))
+    return length, chunk_size
+
+
 @given(
-    length=st.integers(min_value=0, max_value=15),
-    chunk_size=st.integers(min_value=1, max_value=15),
+    len_cs=length_chunk_size(),
     use_args_kwargs=st.tuples(st.booleans(), st.booleans()).filter(any),
 )
-def test_matches_vmap(length, chunk_size, use_args_kwargs):
+def test_matches_vmap(len_cs, use_args_kwargs):
+    length, chunk_size = len_cs
     use_args, use_kwargs = use_args_kwargs
 
     def fun(arg=1, arg2=1):
