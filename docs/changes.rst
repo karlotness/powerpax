@@ -10,6 +10,8 @@ v0.2.0 (Unreleased)
 -------------------
 
 * Require Python 3.10 or later.
+* Fix bug in :func:`~powerpax.sliced_scan` and
+  :func:`~powerpax.checkpoint_chunked_scan` for zero length inputs
 
 v0.1.2
 ------
