@@ -3,6 +3,7 @@
 
 # Python scratch files
 __pycache__/
+.hypothesis/
 *.pyc
 *.pyo
 

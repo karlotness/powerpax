@@ -41,6 +41,7 @@ Documentation = "https://powerpax.readthedocs.io"
 test = [
   "jax[cpu]",
   "pytest",
+  "hypothesis",
 ]
 
 [tool.flit.sdist]
@@ -54,6 +55,7 @@ envlist = ["py3", "lint", "type"]
 description = "Run tests"
 dependency_groups = ["test"]
 commands = [["pytest", {replace = "posargs", extend = true}]]
+passenv = ["CI"]
 setenv = {JAX_PLATFORMS = "cpu"}
 
 [tool.tox.env.lint]

@@ -5,52 +5,36 @@
 import jax
 import jax.numpy as jnp
 import powerpax as ppx
-import pytest
+from hypothesis import given, strategies as st
 
 
-@pytest.mark.parametrize("chunk_size", [None, 1, 2, 5, 7, 15, 100])
-@pytest.mark.parametrize("reverse", [True, False])
-@pytest.mark.parametrize(
-    "use_xs,use_length", [(True, True), (True, False), (False, True)]
+@given(
+    length=st.integers(min_value=0, max_value=15),
+    chunk_size=(st.integers(min_value=1, max_value=100) | st.none()),
+    reverse=st.booleans(),
+    use_xs_length=st.tuples(st.booleans(), st.booleans()).filter(any),
+    unroll=st.integers(min_value=1, max_value=17),
 )
-def test_matches_scan(chunk_size, reverse, use_xs, use_length):
+def test_matches_scan(length, chunk_size, reverse, use_xs_length, unroll):
+    use_xs, use_length = use_xs_length
+
     def scan_fn(carry, x):
         return carry + 1, (carry, x)
 
-    length = 15
     xs = jnp.arange(length) if use_xs else None
     extra_args = {"length": length} if use_length else {}
-    jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, reverse=reverse, **extra_args)
+    jax_carry, jax_ys = jax.lax.scan(
+        scan_fn, 0, xs, reverse=reverse, unroll=unroll, **extra_args
+    )
     ppx_carry, ppx_ys = jax.jit(
         lambda init, xs: ppx.checkpoint_chunked_scan(
             scan_fn,
             init,
             xs,
             reverse=reverse,
+            unroll=unroll,
             chunk_size=chunk_size,
             **extra_args,
-        )
-    )(0, xs)
-    assert jax.tree_util.tree_all(
-        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_ys, ppx_ys)
-    )
-    assert jax.tree_util.tree_all(
-        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_carry, ppx_carry)
-    )
-
-
-@pytest.mark.parametrize("unroll", [1, 2, 3, 15, 100])
-def test_unroll(unroll):
-    def scan_fn(carry, x):
-        return carry + 1, (carry, x)
-
-    chunk_size = 2
-    length = 15
-    xs = jnp.arange(length)
-    jax_carry, jax_ys = jax.lax.scan(scan_fn, 0, xs, length=length, unroll=unroll)
-    ppx_carry, ppx_ys = jax.jit(
-        lambda init, xs: ppx.checkpoint_chunked_scan(
-            scan_fn, init, xs, unroll=unroll, chunk_size=chunk_size, length=length
         )
     )(0, xs)
     assert jax.tree_util.tree_all(

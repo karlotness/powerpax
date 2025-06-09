@@ -6,17 +6,21 @@ import jax
 import jax.numpy as jnp
 import powerpax as ppx
 import pytest
+from hypothesis import given, strategies as st
 
 
-@pytest.mark.parametrize("chunk_size", [1, 3, 5, 9, 10, 11])
-@pytest.mark.parametrize(
-    "use_args,use_kwargs", [(True, True), (True, False), (False, True)]
+@given(
+    length=st.integers(min_value=0, max_value=15),
+    chunk_size=st.integers(min_value=1, max_value=15),
+    use_args_kwargs=st.tuples(st.booleans(), st.booleans()).filter(any),
 )
-def test_matches_vmap(chunk_size, use_args, use_kwargs):
+def test_matches_vmap(length, chunk_size, use_args_kwargs):
+    use_args, use_kwargs = use_args_kwargs
+
     def fun(arg=1, arg2=1):
         return arg * arg2
 
-    arr = jnp.arange(10)
+    arr = jnp.arange(length)
     args = (arr,) if use_args else ()
     kwargs = {"arg2": arr} if use_kwargs else {}
     jax_res = jax.vmap(fun)(*args, **kwargs)
