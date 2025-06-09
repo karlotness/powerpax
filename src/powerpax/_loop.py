@@ -39,7 +39,7 @@ def get_target_length(xs: object, length: int | None) -> int:
 
 
 def clip(a: int, a_min: int, a_max: int) -> int:
-    return min(max(a, a_min), a_max)
+    return max(min(a, a_max), a_min)
 
 
 def compute_slices(
