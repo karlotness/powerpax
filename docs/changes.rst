@@ -6,8 +6,8 @@ version of `powerpax`. More information and release builds are also
 available on the `GitHub releases page
 <https://github.com/karlotness/powerpax/releases>`__.
 
-v0.2.0 (Unreleased)
--------------------
+v0.2.0
+------
 
 * Require Python 3.10 or later.
 * Fix bug in :func:`~powerpax.sliced_scan` and
