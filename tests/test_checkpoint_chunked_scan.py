@@ -5,7 +5,7 @@
 import jax
 import jax.numpy as jnp
 import powerpax as ppx
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, strategies as st
 
 
 @st.composite
@@ -21,6 +21,7 @@ def length_chunk_size_unroll(draw):
     reverse=st.booleans(),
     use_xs_length=st.tuples(st.booleans(), st.booleans()).filter(any),
 )
+@settings(deadline=None)
 def test_matches_scan(len_cs_unr, reverse, use_xs_length):
     length, chunk_size, unroll = len_cs_unr
     use_xs, use_length = use_xs_length

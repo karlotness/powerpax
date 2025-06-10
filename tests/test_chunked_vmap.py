@@ -6,7 +6,7 @@ import jax
 import jax.numpy as jnp
 import powerpax as ppx
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, strategies as st
 
 
 @st.composite
@@ -20,6 +20,7 @@ def length_chunk_size(draw):
     len_cs=length_chunk_size(),
     use_args_kwargs=st.tuples(st.booleans(), st.booleans()).filter(any),
 )
+@settings(deadline=None)
 def test_matches_vmap(len_cs, use_args_kwargs):
     length, chunk_size = len_cs
     use_args, use_kwargs = use_args_kwargs

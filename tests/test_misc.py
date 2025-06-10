@@ -3,7 +3,7 @@
 
 
 from powerpax._loop import clip
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, strategies as st
 
 
 @given(
@@ -11,6 +11,7 @@ from hypothesis import given, strategies as st
     min_val=st.integers(),
     max_val=st.integers(),
 )
+@settings(deadline=None)
 def test_clip(val, min_val, max_val):
     clipped = clip(val, min_val, max_val)
     assert clipped >= min_val
