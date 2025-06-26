@@ -11,7 +11,7 @@ from hypothesis import given, settings, strategies as st
 @st.composite
 def length_chunk_size_unroll(draw):
     length = draw(st.integers(min_value=0, max_value=15))
-    chunk_size = draw(st.integers(min_value=1, max_value=length + 1) | st.none())
+    chunk_size = draw(st.none() | st.integers(min_value=1, max_value=length + 1))
     unroll = draw(st.integers(min_value=1, max_value=length + 1))
     return length, chunk_size, unroll
 
