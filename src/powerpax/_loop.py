@@ -217,7 +217,7 @@ def sliced_scan(
             return ys
 
         ys = jax.tree_util.tree_map(
-            lambda sd: jnp.zeros((0,) + sd.shape[1:], dtype=sd.dtype),
+            lambda sd: jnp.zeros((0, *sd.shape[1:]), dtype=sd.dtype),
             jax.eval_shape(dummy_scan, init, xs),
         )
         return carry, ys
@@ -292,7 +292,7 @@ def sliced_scan(
             # Requires a nested scan
             def leaf_reshape(leaf):
                 return leaf[core_slice].reshape(
-                    (outer_steps, abs(step)) + leaf.shape[1:]
+                    (outer_steps, abs(step), *leaf.shape[1:])
                 )
 
             carry, ys = jax.lax.scan(
@@ -450,7 +450,7 @@ def checkpoint_chunked_scan(
         unroll=clip(unroll // chunk_size, 1, num_chunks),
     )
     ys = jax.tree_util.tree_map(
-        lambda leaf: leaf.reshape((core_steps,) + leaf.shape[2:]), ys
+        lambda leaf: leaf.reshape((core_steps, *leaf.shape[2:])), ys
     )
     if rem_steps > 0:
         carry, rem_ys = jax_checkpoint(

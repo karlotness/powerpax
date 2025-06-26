@@ -43,7 +43,7 @@ def split_args(
 ) -> tuple[tuple[A, K], tuple[A, K] | tuple[None, None]]:
     main_size = num_chunks * chunk_size
     leading_args, leading_kwargs = jax.tree_util.tree_map(
-        lambda arr: arr[:main_size].reshape((num_chunks, chunk_size) + arr.shape[1:]),
+        lambda arr: arr[:main_size].reshape((num_chunks, chunk_size, *arr.shape[1:])),
         (args, kwargs),
     )
     # Remainder
@@ -121,7 +121,7 @@ def chunked_vmap(fun: C, chunk_size: int) -> C:
             outer_scan, None, (leading_args, leading_kwargs), length=num_chunks
         )
         ret = jax.tree_util.tree_map(
-            lambda arr: arr.reshape((math.prod(arr.shape[:2]),) + arr.shape[2:]), ret
+            lambda arr: arr.reshape((math.prod(arr.shape[:2]), *arr.shape[2:])), ret
         )
         # Next, the remainder (if needed)
         if rem_args is not None and rem_kwargs is not None:
