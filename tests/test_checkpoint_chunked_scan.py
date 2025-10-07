@@ -45,9 +45,13 @@ def test_matches_scan(len_cs_unr, reverse, use_xs_length):
             **extra_args,
         )
     )(0, xs)
+    assert jax.tree_util.tree_structure(
+        (jax_carry, jax_ys)
+    ) == jax.tree_util.tree_structure((ppx_carry, ppx_ys))
     assert jax.tree_util.tree_all(
-        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_ys, ppx_ys)
-    )
-    assert jax.tree_util.tree_all(
-        jax.tree_util.tree_map(lambda la, lb: jnp.all(la == lb), jax_carry, ppx_carry)
+        jax.tree_util.tree_map(
+            lambda a, b: jnp.array_equal(a, b) and a.dtype == b.dtype,
+            (jax_carry, jax_ys),
+            (ppx_carry, ppx_ys),
+        )
     )

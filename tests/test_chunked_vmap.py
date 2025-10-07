@@ -34,8 +34,7 @@ def test_matches_vmap(len_cs, use_args_kwargs):
     jax_res = jax.vmap(fun)(*args, **kwargs)
     chunked_res = jax.jit(ppx.chunked_vmap(fun, chunk_size=chunk_size))(*args, **kwargs)
     assert jax_res.dtype == chunked_res.dtype
-    assert jax_res.shape == chunked_res.shape
-    assert jnp.all(jax_res == chunked_res)
+    assert jnp.array_equal(jax_res, chunked_res)
 
 
 @pytest.mark.parametrize("chunk_size", [-1, 0])
