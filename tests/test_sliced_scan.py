@@ -13,9 +13,7 @@ from hypothesis import given, settings, strategies as st
 def length_slice_unroll(draw):
     length = draw(st.integers(min_value=0, max_value=15))
     sl = draw(st.slices(length).filter(lambda sl: abs(sl.step or 1) < 2**16))
-    unroll = draw(
-        st.integers(min_value=1, max_value=max(1, len(range(*sl.indices(length)))) + 1)
-    )
+    unroll = draw(st.integers(min_value=1, max_value=length + 1))
     return length, sl, unroll
 
 
