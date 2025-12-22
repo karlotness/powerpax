@@ -393,7 +393,6 @@ def checkpoint_chunked_scan(
     object, object
         A tuple :pycode:`(carry, ys)`.
     """
-    jax_checkpoint = jax.checkpoint  # type: ignore[attr-defined]
     target_length = get_target_length(xs, length)
     unroll = clip(operator.index(unroll), 1, target_length)
     if chunk_size is None:
@@ -405,7 +404,7 @@ def checkpoint_chunked_scan(
         # Do a normal scan with one checkpoint around it
         return typing.cast(
             tuple[C, Y],
-            jax_checkpoint(
+            jax.checkpoint(
                 lambda init, xs: jax.lax.scan(
                     f, init, xs, length=length, reverse=reverse, unroll=unroll
                 )
@@ -430,7 +429,7 @@ def checkpoint_chunked_scan(
     )
     carry = init
 
-    @functools.partial(jax_checkpoint, prevent_cse=False)
+    @functools.partial(jax.checkpoint, prevent_cse=False)
     def inner_scan(carry, xs):
         return jax.lax.scan(
             f,
@@ -453,7 +452,7 @@ def checkpoint_chunked_scan(
         lambda leaf: leaf.reshape((core_steps, *leaf.shape[2:])), ys
     )
     if rem_steps > 0:
-        carry, rem_ys = jax_checkpoint(
+        carry, rem_ys = jax.checkpoint(
             lambda init, xs: jax.lax.scan(
                 f,
                 init,
