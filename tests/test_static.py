@@ -7,7 +7,7 @@ import jax
 
 
 def test_roundtrip_static():
-    obj = ppx.Static(1.5)
+    obj = ppx.Static(object())
     flat, tree = jax.tree_util.tree_flatten(obj)
     obj2 = jax.tree_util.tree_unflatten(tree, flat)
     assert obj == obj2
