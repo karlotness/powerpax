@@ -26,15 +26,24 @@ def test_matches_vmap(len_cs, use_args_kwargs):
     use_args, use_kwargs = use_args_kwargs
 
     def fun(arg=1, arg2=1):
-        return arg * arg2
+        return {"res": arg * arg2, "arg": arg, "arg2": arg2}
 
-    arr = jnp.arange(length)
-    args = (arr,) if use_args else ()
-    kwargs = {"arg2": arr} if use_kwargs else {}
+    args = (jnp.arange(length),) if use_args else ()
+    kwargs = (
+        {"arg2": jnp.arange(length * 6).reshape(length, 2, 3)} if use_kwargs else {}
+    )
     jax_res = jax.vmap(fun)(*args, **kwargs)
     chunked_res = jax.jit(ppx.chunked_vmap(fun, chunk_size=chunk_size))(*args, **kwargs)
-    assert jax_res.dtype == chunked_res.dtype
-    assert jnp.array_equal(jax_res, chunked_res)
+    assert jax.tree_util.tree_structure(jax_res) == jax.tree_util.tree_structure(
+        chunked_res
+    )
+    assert jax.tree_util.tree_all(
+        jax.tree_util.tree_map(
+            lambda a, b: jnp.array_equal(a, b) and a.dtype == b.dtype,
+            jax_res,
+            chunked_res,
+        )
+    )
 
 
 @pytest.mark.parametrize("chunk_size", [-1, 0])
