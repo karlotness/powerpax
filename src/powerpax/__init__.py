@@ -10,7 +10,7 @@ to keep the outputs of only a subset of :func:`jax.lax.scan`
 iterations (:func:`ppx.sliced_scan <powerpax.sliced_scan>`).
 """
 
-__version__ = "0.2.1.dev"
+__version__ = "0.2.1"
 __all__ = ["chunked_vmap", "sliced_scan", "checkpoint_chunked_scan", "Static"]
 
 from ._vmap import chunked_vmap
