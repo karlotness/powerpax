@@ -33,7 +33,7 @@ def test_matches_scan(len_sl_unr, reverse, use_xs_length):
     if use_xs:
         xs = {
             "val": jnp.arange(length, dtype=jnp.int32),
-            "val2": jnp.arange(2 * length, dtype=jnp.uint16).reshape((length, 2)),
+            "val2": jnp.arange(6 * length, dtype=jnp.uint16).reshape((length, 2, 3)),
         }
     else:
         xs = None
