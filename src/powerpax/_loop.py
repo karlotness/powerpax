@@ -8,7 +8,6 @@ import typing
 import jax
 import jax.numpy as jnp
 
-
 C = typing.TypeVar("C")
 X = typing.TypeVar("X")
 Y = typing.TypeVar("Y")

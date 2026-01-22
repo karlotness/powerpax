@@ -6,7 +6,6 @@ import dataclasses
 import typing
 import jax
 
-
 T = typing.TypeVar("T")
 
 

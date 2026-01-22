@@ -9,7 +9,6 @@ import math
 import jax
 import jax.numpy as jnp
 
-
 C = typing.TypeVar("C", bound=typing.Callable[..., typing.Any])
 A = typing.TypeVar("A", bound=tuple[object, ...])
 K = typing.TypeVar("K", bound=dict[str, object])
