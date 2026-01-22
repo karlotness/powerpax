@@ -6,6 +6,12 @@ version of `powerpax`. More information and release builds are also
 available on the `GitHub releases page
 <https://github.com/karlotness/powerpax/releases>`__.
 
+v0.2.1
+------
+
+* Fix bug in :func:`~powerpax.checkpoint_chunked_scan` for
+  multidimensional :pycode:`xs` inputs.
+
 v0.2.0
 ------
 

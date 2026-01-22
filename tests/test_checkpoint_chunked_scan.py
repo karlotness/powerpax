@@ -27,9 +27,16 @@ def test_matches_scan(len_cs_unr, reverse, use_xs_length):
     use_xs, use_length = use_xs_length
 
     def scan_fn(carry, x):
-        return carry + 1, (carry, x)
+        return carry + 1, {"carry": carry, "x": x}
 
-    xs = jnp.arange(length) if use_xs else None
+    if use_xs:
+        xs = {
+            "val": jnp.arange(length, dtype=jnp.int32),
+            "val2": jnp.arange(2 * length, dtype=jnp.uint16).reshape((length, 2)),
+        }
+    else:
+        xs = None
+
     extra_args = {"length": length} if use_length else {}
     jax_carry, jax_ys = jax.lax.scan(
         scan_fn, 0, xs, reverse=reverse, unroll=unroll, **extra_args

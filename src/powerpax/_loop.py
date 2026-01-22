@@ -423,7 +423,7 @@ def checkpoint_chunked_scan(
     core_steps = num_chunks * chunk_size
     core = jax.tree_util.tree_map(
         lambda leaf: (leaf[:core_steps] if not reverse else leaf[-core_steps:]).reshape(
-            (num_chunks, chunk_size)
+            (num_chunks, chunk_size, *leaf.shape[1:])
         ),
         xs,
     )
